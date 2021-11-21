@@ -104,3 +104,76 @@ results_df %>%
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
+
+## Problem 2
+
+A dataframe containing all file names:
+
+```{r}
+file_names_df = 
+  files = tibble(list.files("./data/zip_data/"))
+
+
+file_names_df
+```
+
+
+Iteration over file names:
+
+```{r}
+loop_files = function(x) {
+  
+  data = 
+    read_csv(paste0("./data/zip_data/",x)) %>% 
+    mutate(file_names = x)
+  
+}
+
+all_data = map_df(file_names_df, loop_files)
+```
+
+
+Tidying Data:
+
+```{r}
+new_data = 
+  all_data %>% 
+  gather(key=week, value = arm_val, week_1:week_8)%>% 
+   separate(
+    col = file_names,
+    into= c("arm","id"),
+    sep = "_"
+           )  %>% 
+  mutate(
+    arm = recode(
+      arm,
+      "con" = "control",
+      "exp" = "experimental"
+    ),
+    id=substr(id,start=1, stop=2), 
+  ) 
+
+new_data
+```
+
+
+Spaghetti Plot
+
+```{r}
+tidy_plot =
+ggplot(
+  data = new_data, aes(x=week, y=arm_val, group=id))+
+  geom_line(aes(color=id)) + 
+  geom_point(size=0.5) + 
+  facet_grid(. ~ arm) +
+  labs(
+    title= "Observations over Time by Study Arm",
+      x= "Week",
+      y= "Arm Values"
+    )
+
+tidy_plot
+```
+
+For subjects in the experimental arm, the values increased over time but for the controls, the values don't have a distinct trend over time. While the max arm values for controls is less than 5.0 units, it is much higher for the experimental subjects. 
+
