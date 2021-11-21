@@ -177,3 +177,52 @@ tidy_plot
 
 For subjects in the experimental arm, the values increased over time but for the controls, the values don't have a distinct trend over time. While the max arm values for controls is less than 5.0 units, it is much higher for the experimental subjects. 
 
+
+## Problem 3
+
+
+Importing Data with Code Given:
+
+```{r}
+
+set.seed(10)
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species))
+```
+
+
+Function to replace missing values:
+
+```{r}
+missing_values = function(x) {
+  
+  if (is.character(x)) {
+    
+    x[is.na(x)] = "Viriginica"
+    
+  } 
+  
+  else if (is.numeric(x)) {
+    
+    x[is.na(x)] = mean(x, na.rm=TRUE)
+    
+  }
+  
+  return(x)
+  
+}
+```
+
+Applying this function to the columns:
+
+```{r}
+
+for(i in 1:5) {
+  
+  iris_with_missing[i] = map(iris_with_missing[i], ~missing_values(.x))
+  
+}
+
+iris_with_missing
+```
