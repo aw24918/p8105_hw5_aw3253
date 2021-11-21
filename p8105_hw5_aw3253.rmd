@@ -13,8 +13,6 @@ library(p8105.datasets)
 
 # Problem 1
 
-Describe Raw Data:
-
 ```{r message=FALSE}
 homicide_df=
   read_csv("./data/homicide-data.csv", na=c("", "Unknown")) %>% 
